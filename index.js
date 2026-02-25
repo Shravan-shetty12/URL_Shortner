@@ -1,19 +1,33 @@
 const express=require('express');
 require("dotenv").config();
 const path=require('path');
+const cookieParser=require('cookie-parser');
 const connectToMongoDB = require('./connect');
+const {v4:uuidv4}=require('uuid');
+const {restrictTologgedInUsers,checkAuth}=require('./middleware/auth');
+
+
+
+
+
 const urlRoutes=require('./routes/url');
 const staticRoute=require('./routes/staticRouter');
-
+const userRoutes=require('./routes/user');      
 
 
 const app=express();
 const port=8001;
+
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());//middleware to parse json request body
+app.use(cookieParser());//middleware to parse cookies from incoming requests
 
-app.use("/url",urlRoutes);
-app.use("/",staticRoute)
+app.use("/url",restrictTologgedInUsers,urlRoutes);
+app.use("/",checkAuth,staticRoute);//for ejs home files
+app.use("/user",userRoutes);   
+
+
+ 
 
 
 app.set('view engine','ejs');
@@ -32,11 +46,12 @@ app.get("/test",async (req,res)=>{
 //redirecting to the main url and updating the visit history
 const URL=require('./models/url');
 const { url } = require('inspector');
-app.get('/:shortId',async(req,res)=>{
 
+
+app.get('/:shortId',async(req,res)=>{
     const shortId=req.params.shortId;
     const entry= await URL.findOneAndUpdate({shortId},{$push:{visitHistory:{timestamp:Date.now()}}});
-res.redirect(entry.redirectURL);
+    return res.redirect(entry.redirectURL);
 });
 
 
