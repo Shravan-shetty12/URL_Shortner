@@ -2,11 +2,15 @@ const {getUser}=require('../service/auth');
 
 function restrictTologgedInUsers(req,res,next){
 
-    const sessionId=req.cookies?.uid;
-    if(!sessionId){
+    //const sessionId=req.cookies?.uid;
+    const userId=req.headers["authorization"];
+    if(!userId){
         return res.redirect("/login");
     }
-    const user=getUser(sessionId);
+    
+    
+    const token=userId.split('Bearer ')[1];
+    const user=getUser(token);
     if(!user){
         return res.redirect("/login");
     }
@@ -15,11 +19,18 @@ function restrictTologgedInUsers(req,res,next){
 }
 
 
-async function checkAuth(req,res,next){const sessionId=req.cookies?.uid;
-   
-    const user=getUser(sessionId);
-    
-    req.user=user;
+function checkAuth(req, res, next) {
+    const authHeader = req.headers["authorization"];
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        req.user = null;
+        return next();   // don't crash
+    }
+
+    const token = authHeader.split(" ")[1];
+    const user = getUser(token);
+
+    req.user = user || null;
     next();
 }
 module.exports={
