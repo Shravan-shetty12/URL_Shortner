@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const {setUser}=require('../service/auth');
 const {v4:uuidv4}=require('uuid');
+
+
 async function handleUserRegistration(req,res) {
     const {name,email,password}=req.body;
     await User.create({
@@ -22,11 +24,9 @@ async function handleUserlogin(req,res) {
     /*const sessionId=uuidv4();
     setUser(sessionId,user);*/
     const token=setUser(user);
-    /*res.cookie("uid",token);
-    return  res.redirect("/");*/
-    return res.json({
-        token
-    });
+    res.cookie("token",token);
+    return  res.redirect("/");
+    
 }
 
 

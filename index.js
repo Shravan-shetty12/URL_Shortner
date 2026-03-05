@@ -4,11 +4,11 @@ const path=require('path');
 const cookieParser=require('cookie-parser');
 const connectToMongoDB = require('./connect');
 const {v4:uuidv4}=require('uuid');
-const {restrictTologgedInUsers,checkAuth}=require('./middleware/auth');
+const {restrictTo,checkForAuthentication}=require('./middleware/auth');
 
 
 
-
+ 
 
 const urlRoutes=require('./routes/url');
 const staticRoute=require('./routes/staticRouter');
@@ -21,9 +21,10 @@ const port=8001;
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());//middleware to parse json request body
 app.use(cookieParser());//middleware to parse cookies from incoming requests
-
-app.use("/url",restrictTologgedInUsers,urlRoutes);
-app.use("/",checkAuth,staticRoute);//for ejs home files
+app.use(checkForAuthentication);//middleware to check for authentication in incoming requests and set req.user accordingly  
+   
+app.use("/url",restrictTo(["NORMAL"]),urlRoutes);
+app.use("/",staticRoute);//for ejs home files
 app.use("/user",userRoutes);   
 
 
@@ -53,8 +54,6 @@ app.get('/:shortId',async(req,res)=>{
     const entry= await URL.findOneAndUpdate({shortId},{$push:{visitHistory:{timestamp:Date.now()}}});
     return res.redirect(entry.redirectURL);
 });
-
-
 
 
 

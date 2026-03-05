@@ -1,8 +1,36 @@
 const {getUser}=require('../service/auth');
 
-function restrictTologgedInUsers(req,res,next){
 
-    //const sessionId=req.cookies?.uid;
+
+function checkForAuthentication(req,res,next){
+    const tokenCookie=req.cookies?.token;
+    req.user=null;
+    if(!tokenCookie){
+        return next();
+    }
+    const token=tokenCookie;
+
+    const user=getUser(token);
+    req.user=user;
+    return next();
+}
+
+
+function restrictTo(roles){
+    return function(req,res,next){
+        if(!req.user ) return res.redirect("/login");
+        if(!roles.includes(req.user.role)) return res.end("Unauthorized");
+        return next();
+
+}
+}
+
+
+
+
+/*
+ function restrictTologgedInUsers(req,res,next){
+    const sessionId=req.cookies?.uid;
     const userId=req.headers["authorization"];
     if(!userId){
         return res.redirect("/login");
@@ -33,7 +61,9 @@ function checkAuth(req, res, next) {
     req.user = user || null;
     next();
 }
+*/
+
 module.exports={
-    restrictTologgedInUsers,
-    checkAuth,
+    checkForAuthentication,
+    restrictTo,
 }   
