@@ -1,0 +1,16 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Shrtn.' : 'Shrtn. — Shorten. Share. Track.' %></title>
+<meta name="description" content="Create clean, memorable short links in seconds. Free URL shortener.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<!-- Inline theme script — prevents flash of unstyled content -->
+<script>
+  (function(){
+    var s=localStorage.getItem('theme');
+    var d=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', s||(d?'dark':'light'));
+  })();
+</script>

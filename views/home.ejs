@@ -1,57 +1,128 @@
-
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<head><%- include('partials/head', { pageTitle: 'Home' }) %></head>
 <body>
 
+<%- include('partials/navbar', { activePage: 'home' }) %>
 
-  <h1>URL Shortener</h1>
-  <% if(locals.id) {%>
-    <p>Shortened URL: http://localhost:8001/<%= id %></p>
-    <% } %>
-  <div>
-    <form method="post" action="/url/">
-        <label for="urlid">Enter URL to shorten:</label>
-        <input type="text" id="urlid" name="url"  placeholder="https://example.com">
-        <button type="submit">Shorten</button>
+<main class="main">
+  <div class="home-wrap">
 
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero__eyebrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Fast &amp; Free
+      </div>
+      <h1 class="hero__title">Shorten. <span>Share.</span> Track.</h1>
+      <p class="hero__sub">Create clean, memorable links in seconds. No account required.</p>
+    </section>
+
+    <!-- Shorten Form -->
+    <form class="shorten-form" method="POST" action="/url/">
+      <div class="form-group">
+        <input
+          class="input"
+          type="url"
+          name="url"
+          id="urlInput"
+          placeholder="Paste your long URL here..."
+          required
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+      <button type="submit" class="btn btn-primary btn-primary-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Shorten URL
+      </button>
+      <p class="form-hint" style="text-align:center;">Free. No account required.</p>
     </form>
-  </div>
 
+    <!-- Result Card -->
+    <% if (locals.id) { %>
+    <div class="result-card" id="result-card">
+      <div class="result-card__label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Link created successfully
+      </div>
+      <div class="result-card__row">
+        <a class="result-card__url" href="/<%= id %>" target="_blank" rel="noopener">
+          <%= `${typeof req !== 'undefined' ? req.protocol + '://' + req.get('host') : 'http://localhost:8001'}/${id}` %>
+        </a>
+        <button
+          class="btn btn-ghost btn-sm"
+          data-copy="http://localhost:8001/<%= id %>"
+          data-feedback="copy-msg"
+          title="Copy link"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="result-card__meta">
+        <span id="copy-msg" class="copy-feedback">Copied!</span>
+      </div>
+    </div>
+    <% } %>
 
+    <!-- Recent Links -->
+    <% if (locals.urls && urls.length > 0) { %>
+    <div>
+      <div class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        My Links
+        <span class="badge badge-neutral"><%= urls.length %></span>
+      </div>
 
-
-  <div>
-    <% if (locals.urls) { %>
-      <table border="solid black">
-        <thead>
-          <th>S.NO</th>
-          <th>Short</th>
-          <th>Redirect</th>
-          <th>Clicks</th>
-        </thead>
-        <tbody>
-          
-          <% urls.forEach(function(url,index) { %>
-            <tr>
-            <td><%= index+1 %></td>
-            <td><%= url.shortId %></td>
-            <td><%= url.redirectURL %></td>
-            <td><%= url.visitHistory.length   %></td>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Original URL</th>
+                <th>Short Link</th>
+                <th>Created At</th>
+                <th>Clicks</th>
+                <th></th>
               </tr>
-           
-          <% })%>
-          
-
-        </tbody>
-      </table>
-<% } %>
+            </thead>
+            <tbody>
+              <% urls.forEach(function(url) { %>
+              <tr>
+                <td class="td-url" title="<%= url.redirectURL %>"><%= url.redirectURL %></td>
+                <td class="td-short">
+                  <a href="/<%= url.shortId %>" target="_blank" rel="noopener">/<%= url.shortId %></a>
+                </td>
+                <td class="td-date"><%= new Date(url.createdAt).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) %></td>
+                <td>
+                  <span class="badge badge-primary"><%= url.visitHistory.length %></span>
+                </td>
+                <td class="td-actions">
+                  <button
+                    class="btn-icon"
+                    data-copy="http://localhost:8001/<%= url.shortId %>"
+                    title="Copy"
+                    style="width:28px;height:28px;"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <% } %>
 
   </div>
+</main>
 
-    
+<%- include('partials/footer') %>
+
+<script src="/js/theme.js"></script>
+<script src="/js/app.js"></script>
 </body>
 </html>

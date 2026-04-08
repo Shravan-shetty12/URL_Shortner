@@ -1,8 +1,23 @@
 const {nanoid} = require('nanoid');
 const URl=require('../models/url');
+
+
+try {
+   
+
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}; 
+
+
 async function handleGenerateNewShortUrl(req,res) {
     const body=req.body;
-    if(!body.url) return res.status(400).json({error:'URL is required'});
+    if(!body.url || !isValidUrl(req.body.url)) return res.status(400).json({error:'URL is required'});
     const shortId = nanoid(8);
 
     await URl.create({
@@ -12,7 +27,7 @@ async function handleGenerateNewShortUrl(req,res) {
         createdBy:req.user._id,
 });
 
-res.render("home", { id: shortId });
+res.redirect(`/?id=${shortId}`);
     
 }
 
@@ -32,3 +47,12 @@ async function getAnalyticsForShortUrl(req,res) {
 
 }
 module.exports={handleGenerateNewShortUrl,getAnalyticsForShortUrl};
+
+
+
+
+
+} catch (err) {
+   console.error(err);
+   res.status(500).send("Server error");
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head', { pageTitle: '404 — Not Found' }) %></head>
+<body>
+
+<%- include('partials/navbar', {}) %>
+
+<main class="main">
+  <div class="error-wrap">
+    <div class="error-num">404</div>
+    <h1 class="error-title">This link doesn't exist</h1>
+    <p class="error-sub">The short URL you followed may have expired, been removed, or never existed.</p>
+    <a href="/" class="btn btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Go back home
+    </a>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/js/theme.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

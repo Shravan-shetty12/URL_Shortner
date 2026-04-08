@@ -21,7 +21,11 @@ const userRoutes=require('./routes/user');
 const authRoutes = require("./routes/auth");
 
 const app=express();
-const port=8001;
+const PORT = process.env.PORT || 8001;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+
+// Serve static assets
+app.use(express.static(path.resolve('./public')));
 
 //OAuth session configuration
 app.use(
@@ -52,7 +56,7 @@ app.use("/auth", authRoutes); // for O Authentication routes
 
 
 app.set('view engine','ejs');
-app.set('views',path.resolve("./views"));
+app.set('views',path.resolve('./views'));
 
 
 
@@ -70,7 +74,7 @@ app.get('/:shortId', async (req,res)=>{
         { $push:{ visitHistory:{ timestamp:Date.now() } } }
     );
     if(!entry){
-        return res.status(404).send("Short URL not found");
+        return res.status(404).render('404');
     }
     return res.redirect(entry.redirectURL);
 });
@@ -85,9 +89,18 @@ app.get('/:shortId', async (req,res)=>{
 
 
 
-app.listen(port,()=>{
+/*app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
 });
 connectToMongoDB(process.env.Mongo_URL).then(()=>{
     console.log('Connected to MongoDB');
-});
+});*/
+
+connectToMongoDB(process.env.MONGO_URL)
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+  })
+  .catch((err) => {
+    console.error("DB connection failed", err);
+  });

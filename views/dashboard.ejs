@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head', { pageTitle: 'Admin Dashboard' }) %></head>
+<body>
+
+<%- include('partials/navbar', { activePage: 'admin' }) %>
+
+<main class="main">
+  <div class="admin-wrap">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">All Links</h1>
+      <span class="badge badge-admin">Admin</span>
+      <span class="badge badge-neutral"><%= urls.length %> total</span>
+    </div>
+
+    <!-- Stats Bar -->
+    <%
+      const totalClicks = urls.reduce(function(sum, u){ return sum + u.visitHistory.length; }, 0);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const todayCount = urls.filter(function(u){ return new Date(u.createdAt) >= today; }).length;
+    %>
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div class="stat-card__num"><%= urls.length %></div>
+        <div class="stat-card__label">Total Links</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        </div>
+        <div class="stat-card__num"><%= totalClicks %></div>
+        <div class="stat-card__label">Total Clicks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        </div>
+        <div class="stat-card__num"><%= todayCount %></div>
+        <div class="stat-card__label">Created Today</div>
+      </div>
+    </div>
+
+    <!-- Links Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-header__title">All Shortened URLs</span>
+      </div>
+
+      <% if (urls.length > 0) { %>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Original URL</th>
+              <th>Short Link</th>
+              <th>Created By</th>
+              <th>Created At</th>
+              <th>Clicks</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% urls.forEach(function(url, i) { %>
+            <tr>
+              <td style="color:var(--text-subtle);"><%= i + 1 %></td>
+              <td class="td-url" title="<%= url.redirectURL %>"><%= url.redirectURL %></td>
+              <td class="td-short">
+                <a href="/<%= url.shortId %>" target="_blank" rel="noopener">/<%= url.shortId %></a>
+              </td>
+              <td style="font-size:12px;color:var(--text-muted);">
+                <%= url.createdBy ? (url.createdBy.name || url.createdBy.email) : '—' %>
+              </td>
+              <td class="td-date"><%= new Date(url.createdAt).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) %></td>
+              <td><span class="badge badge-primary"><%= url.visitHistory.length %></span></td>
+              <td class="td-actions">
+                <button
+                  class="btn-icon"
+                  data-copy="http://localhost:8001/<%= url.shortId %>"
+                  title="Copy link"
+                  style="width:30px;height:30px;"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                </button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } else { %>
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div class="empty-state__title">No links yet</div>
+        <p class="empty-state__sub">Shortened URLs will appear here once users start creating them.</p>
+        <a href="/" class="btn btn-primary btn-sm" style="margin-top:8px;">Create your first link</a>
+      </div>
+      <% } %>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/js/theme.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
