@@ -22,7 +22,6 @@ const authRoutes = require("./routes/auth");
 
 const app=express();
 const PORT = process.env.PORT || 8001;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
 
 // Serve static assets
 app.use(express.static(path.resolve('./public')));
@@ -96,7 +95,7 @@ connectToMongoDB(process.env.Mongo_URL).then(()=>{
     console.log('Connected to MongoDB');
 });*/
 
-connectToMongoDB(process.env.MONGO_URL)
+connectToMongoDB(process.env.Mongo_URL)
   .then(() => {
     console.log("MongoDB connected");
     app.listen(PORT, () => console.log(`Server running on ${PORT}`));
