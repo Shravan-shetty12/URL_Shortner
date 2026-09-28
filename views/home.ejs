@@ -48,14 +48,14 @@
       </div>
       <div class="result-card__row">
         <a class="result-card__url" href="/<%= id %>" target="_blank" rel="noopener">
-          <%= `${typeof req !== 'undefined' ? req.protocol + '://' + req.get('host') : 'http://localhost:8001'}/${id}` %>
-        </a>
-        <button
-          class="btn btn-ghost btn-sm"
-          data-copy="http://localhost:8001/<%= id %>"
-          data-feedback="copy-msg"
-          title="Copy link"
-        >
+  <%= `${typeof req !== 'undefined' ? req.protocol + '://' + req.get('host') : 'http://localhost:8001'}/${id}` %>
+</a>
+ <button
+  class="btn btn-ghost btn-sm"
+  data-copy="<%= id %>"
+  data-feedback="copy-msg"
+  title="Copy link"
+>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
           Copy
         </button>
@@ -122,7 +122,15 @@
 
 <%- include('partials/footer') %>
 
+
 <script src="/js/theme.js"></script>
 <script src="/js/app.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.has("id")) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+</script>
 </body>
 </html>

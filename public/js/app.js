@@ -1,11 +1,14 @@
-document.addEventListener('DOMContentLoaded', function () {
-
+document.addEventListener("DOMContentLoaded", function () {
   // ── Navbar scroll border ──────────────────────────────────
-  const navbar = document.querySelector('.navbar');
+  const navbar = document.querySelector(".navbar");
   if (navbar) {
-    window.addEventListener('scroll', function () {
-      navbar.classList.toggle('scrolled', window.scrollY > 8);
-    }, { passive: true });
+    window.addEventListener(
+      "scroll",
+      function () {
+        navbar.classList.toggle("scrolled", window.scrollY > 8);
+      },
+      { passive: true },
+    );
   }
 
   // ── Copy to clipboard ─────────────────────────────────────
@@ -14,37 +17,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function copyText(text, btn, feedbackEl) {
     navigator.clipboard.writeText(text).then(function () {
-      btn.innerHTML = checkIcon + (btn.dataset.label ? ' ' + btn.dataset.label : '');
-      btn.style.color = 'var(--success)';
-      if (feedbackEl) feedbackEl.classList.add('show');
+      btn.innerHTML =
+        checkIcon + (btn.dataset.label ? " " + btn.dataset.label : "");
+      btn.style.color = "var(--success)";
+      if (feedbackEl) feedbackEl.classList.add("show");
       setTimeout(function () {
-        btn.innerHTML = copyIcon + (btn.dataset.label ? ' ' + btn.dataset.label : '');
-        btn.style.color = '';
-        if (feedbackEl) feedbackEl.classList.remove('show');
+        btn.innerHTML =
+          copyIcon + (btn.dataset.label ? " " + btn.dataset.label : "");
+        btn.style.color = "";
+        if (feedbackEl) feedbackEl.classList.remove("show");
       }, 2000);
     });
   }
 
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('[data-copy]');
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-copy]");
     if (!btn) return;
-    const text = btn.getAttribute('data-copy');
-    const feedbackId = btn.getAttribute('data-feedback');
+
+    let text = btn.getAttribute("data-copy");
+
+    // If data-copy contains only the short ID,
+    // construct the complete URL using the current domain.
+    if (!text.startsWith("http")) {
+      text = window.location.origin + "/" + text;
+    }
+
+    const feedbackId = btn.getAttribute("data-feedback");
     const feedbackEl = feedbackId ? document.getElementById(feedbackId) : null;
+
     copyText(text, btn, feedbackEl);
   });
 
   // ── Reveal result card if shortId present ─────────────────
-  const resultCard = document.getElementById('result-card');
-  if (resultCard) resultCard.classList.add('visible');
+  const resultCard = document.getElementById("result-card");
+  if (resultCard) resultCard.classList.add("visible");
 
   // ── Auto-dismiss alerts ───────────────────────────────────
-  document.querySelectorAll('.alert[data-auto-dismiss]').forEach(function (el) {
+  document.querySelectorAll(".alert[data-auto-dismiss]").forEach(function (el) {
     setTimeout(function () {
-      el.style.transition = 'opacity 0.3s ease';
-      el.style.opacity = '0';
-      setTimeout(function () { el.remove(); }, 300);
+      el.style.transition = "opacity 0.3s ease";
+      el.style.opacity = "0";
+      setTimeout(function () {
+        el.remove();
+      }, 300);
     }, 4000);
   });
-
 });
