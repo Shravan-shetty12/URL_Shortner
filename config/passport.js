@@ -11,20 +11,32 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({
-          email: profile.emails[0].value,
-        });
+        const email = profile.emails[0].value.trim().toLowerCase();
+
+        let user = await User.findOne({ email });
 
         if (!user) {
           user = await User.create({
             name: profile.displayName,
-            email: profile.emails[0].value,
+            email: email,
             googleId: profile.id,
           });
         }
 
         return done(null, user);
       } catch (err) {
+        if (err.code === 11000) {
+          // Another request may have created the user simultaneously
+          const user = await User.findOne({
+            email: profile.emails[0].value.trim().toLowerCase(),
+          });
+
+          if (user) {
+            return done(null, user);
+          }
+        }
+
+        console.error("Google OAuth error:", err);
         return done(err, null);
       }
     },

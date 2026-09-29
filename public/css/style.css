@@ -589,7 +589,33 @@ tbody td {
 .td-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+
+}
+.btn-delete {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  color: #ff5c5c;
+  border-color: rgba(255, 92, 92, 0.5);
+  background: rgba(255, 92, 92, 0.08);
+}
+
+.btn-delete:active {
+  transform: scale(0.94);
 }
 
 .td-date { color: var(--text-muted); font-size: 12px; white-space: nowrap; }

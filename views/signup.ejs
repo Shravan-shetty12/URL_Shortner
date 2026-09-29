@@ -10,7 +10,11 @@
     <div class="auth-card">
       <h1 class="auth-title">Create an account</h1>
       <p class="auth-sub">Start shortening links for free.</p>
-
+<% if (locals.error) { %>
+  <div class="alert alert-error">
+    <%= error %>
+  </div>
+<% } %>
       <form class="auth-form" method="POST" action="/user/">
         <div class="form-group">
           <label class="form-label" for="name">Name</label>
