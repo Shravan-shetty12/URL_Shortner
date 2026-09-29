@@ -15,8 +15,14 @@
         Fast &amp; Free
       </div>
       <h1 class="hero__title">Shorten. <span>Share.</span> Track.</h1>
-      <p class="hero__sub">Create clean, memorable links in seconds. No account required.</p>
+      <p class="hero__sub">Create clean, memorable links in seconds.</p>
     </section>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-error">
+    <%= error %>
+  </div>
+<% } %>
 
     <!-- Shorten Form -->
     <form class="shorten-form" method="POST" action="/url/">
@@ -32,6 +38,28 @@
           spellcheck="false"
         >
       </div>
+      <div class="form-group">
+  <label class="form-label" for="customAlias">
+    Custom Alias
+    <span style="opacity: 0.6;">(Optional)</span>
+  </label>
+
+  <input
+    class="input"
+    type="text"
+    id="customAlias"
+    name="customAlias"
+    placeholder="e.g. portfolio"
+    maxlength="30"
+    pattern="[A-Za-z0-9_-]+"
+    title="Only letters, numbers, hyphens and underscores are allowed"
+    autocomplete="off"
+  >
+
+  <p class="form-hint">
+    Leave empty to generate a random short URL.
+  </p>
+</div>
       <button type="submit" class="btn btn-primary btn-primary-lg">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         Shorten URL

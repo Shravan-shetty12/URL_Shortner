@@ -12,19 +12,70 @@ try {
   };
 
   async function handleGenerateNewShortUrl(req, res) {
-    const body = req.body;
-    if (!body.url || !isValidUrl(req.body.url))
-      return res.status(400).json({ error: "URL is required" });
-    const shortId = nanoid(8);
+    try {
+      const { url } = req.body;
 
-    await URl.create({
-      shortId: shortId,
-      redirectURL: body.url,
-      visitHistory: [],
-      createdBy: req.user._id,
-    });
+      const customAlias = req.body.customAlias?.trim();
 
-    res.redirect(`/?id=${shortId}`);
+      // Validate URL
+      if (!url || !isValidUrl(url)) {
+        return res.status(400).json({
+          error: "Please enter a valid URL.",
+        });
+      }
+
+      // Validate custom alias
+      if (customAlias) {
+        if (!/^[A-Za-z0-9_-]+$/.test(customAlias)) {
+          return res.status(400).json({
+            error:
+              "Custom alias can contain only letters, numbers, hyphens and underscores.",
+          });
+        }
+
+        // Check whether alias already exists
+        const existingUrl = await URl.findOne({
+          shortId: customAlias,
+        });
+
+        if (existingUrl) {
+          return res.status(409).render("home", {
+            error: "This custom alias is already taken.",
+            urls: await URl.find({ createdBy: req.user._id }).sort({
+              createdAt: -1,
+            }),
+          });
+        }
+      }
+
+      // Use custom alias OR generate random ID
+      const shortId = customAlias || nanoid(8);
+
+      await URl.create({
+        shortId,
+        redirectURL: url,
+        visitHistory: [],
+        createdBy: req.user._id,
+      });
+
+      return res.redirect(`/?id=${shortId}`);
+    } catch (err) {
+      // Handles race-condition collision
+      if (err.code === 11000) {
+        return res.status(409).render("home", {
+          error: "This custom alias is already taken. Please choose another.",
+          urls: await URl.find({ createdBy: req.user._id }).sort({
+            createdAt: -1,
+          }),
+        });
+      }
+
+      console.error("URL creation error:", err);
+
+      return res.status(500).json({
+        error: "Unable to create short URL. Please try again.",
+      });
+    }
   }
 
   async function getAnalyticsForShortUrl(req, res) {
