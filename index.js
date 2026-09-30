@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const { restrictTo, checkForAuthentication } = require("./middleware/auth");
 const session = require("express-session");
 const passport = require("passport");
+const redis = require("./config/redis");
 require("./config/passport");
 
 const urlRoutes = require("./routes/url");
@@ -60,14 +61,59 @@ const { url } = require("inspector");
 
 app.get("/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
-  const entry = await URL.findOneAndUpdate(
-    { shortId },
-    { $push: { visitHistory: { timestamp: Date.now() } } },
-  );
-  if (!entry) {
-    return res.status(404).render("404");
+
+  try {
+    // 1. Check Redis
+    const cachedURL = await redis.get(`url:${shortId}`);
+
+    if (cachedURL) {
+      console.log("Redis HIT:", shortId);
+
+      // Keep analytics in MongoDB
+      await URL.updateOne(
+        { shortId },
+        {
+          $push: {
+            visitHistory: {
+              timestamp: Date.now(),
+            },
+          },
+        },
+      );
+
+      return res.redirect(cachedURL);
+    }
+
+    console.log("Redis MISS:", shortId);
+
+    // 2. Cache miss → MongoDB
+    const entry = await URL.findOne({ shortId });
+
+    if (!entry) {
+      return res.status(404).render("404");
+    }
+
+    // 3. Store URL in Redis
+    await redis.set(`url:${shortId}`, entry.redirectURL);
+
+    // 4. Update analytics
+    await URL.updateOne(
+      { shortId },
+      {
+        $push: {
+          visitHistory: {
+            timestamp: Date.now(),
+          },
+        },
+      },
+    );
+
+    // 5. Redirect
+    return res.redirect(entry.redirectURL);
+  } catch (error) {
+    console.error("Redirect error:", error);
+    return res.status(500).send("Internal Server Error");
   }
-  return res.redirect(entry.redirectURL);
 });
 
 /*app.listen(port,()=>{
