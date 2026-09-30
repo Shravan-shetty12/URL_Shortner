@@ -28,9 +28,14 @@ try {
       // Validate custom alias
       if (customAlias) {
         if (!/^[A-Za-z0-9_-]+$/.test(customAlias)) {
-          return res.status(400).json({
+          return res.status(400).render("home", {
             error:
-              "Custom alias can contain only letters, numbers, hyphens and underscores.",
+              "Invalid custom alias. Use only letters, numbers, hyphens and underscores.",
+            urls: await URl.find({ createdBy: req.user._id }).sort({
+              createdAt: -1,
+            }),
+            user: req.user,
+            id: null,
           });
         }
 
@@ -45,6 +50,8 @@ try {
             urls: await URl.find({ createdBy: req.user._id }).sort({
               createdAt: -1,
             }),
+            user: req.user,
+            id: null,
           });
         }
       }
