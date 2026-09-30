@@ -17,9 +17,9 @@
       <% } %>
       <div class="navbar__user">
         <div class="navbar__user-avatar">
-          <%= (user.name || user.email || 'U').charAt(0).toUpperCase() %>
+         <%= (user.name || 'U').charAt(0).toUpperCase() %>
         </div>
-        <span><%= user.name || user.email %></span>
+        <span><%= user.name %></span>
       </div>
       <a href="/user/logout" class="btn-logout">Logout</a>
     <% } else { %>

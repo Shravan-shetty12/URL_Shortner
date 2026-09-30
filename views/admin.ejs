@@ -52,8 +52,26 @@
 
     <div class="table-wrap">
       <div class="table-header">
-        <span class="table-header__title">All Shortened URLs</span>
-      </div>
+  <span class="table-header__title">
+    All Shortened URLs
+  </span>
+
+  <div style="display:flex; gap:8px; align-items:center;">
+    <span class="badge badge-success">
+      <%= cachedCount %> Cached
+    </span>
+
+    <% if (cachedOnly) { %>
+      <a href="/admin/urls" class="btn btn-ghost btn-sm">
+        Show All
+      </a>
+    <% } else { %>
+      <a href="/admin/urls?cache=cached" class="btn btn-ghost btn-sm">
+        Cached Only
+      </a>
+    <% } %>
+  </div>
+</div>
 
       <% if (urls.length > 0) { %>
       <div class="table-scroll">
@@ -66,6 +84,7 @@
               <th>Created By</th>
               <th>Created At</th>
               <th>Clicks</th>
+              <th>Cache</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -82,16 +101,74 @@
               </td>
               <td class="td-date"><%= new Date(url.createdAt).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) %></td>
               <td><span class="badge badge-primary"><%= url.visitHistory.length %></span></td>
+              <td>
+  <% if (url.isCached) { %>
+    <span class="badge badge-success">Cached</span>
+  <% } else { %>
+    <span class="badge badge-neutral">Not Cached</span>
+  <% } %>
+</td>
               <td class="td-actions">
-                <button
-                  class="btn-icon"
-                  data-copy="http://localhost:8001/<%= url.shortId %>"
-                  title="Copy link"
-                  style="width:30px;height:30px;"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                </button>
-              </td>
+
+    <!-- Copy Button -->
+    <button
+        class="btn-icon"
+        data-copy="http://localhost:8001/<%= url.shortId %>"
+        title="Copy link"
+        style="width:30px;height:30px;"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <rect width="14" height="14" x="8" y="8" rx="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+        </svg>
+    </button>
+
+    <!-- Delete Button -->
+    <form
+        method="POST"
+        action="/admin/urls/<%= url.shortId %>/delete"
+        class="delete-form"
+        onsubmit="return confirm('Delete this short link permanently?');"
+        style="display:inline;"
+    >
+        <button
+            type="submit"
+            class="btn-icon btn-delete"
+            title="Delete link"
+            style="width:30px;height:30px;"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M3 6h18"/>
+                <path d="M8 6V4h8v2"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v5"/>
+                <path d="M14 11v5"/>
+            </svg>
+        </button>
+    </form>
+
+</td>
+      
             </tr>
             <% }) %>
           </tbody>

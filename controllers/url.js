@@ -1,5 +1,6 @@
 const { nanoid } = require("nanoid");
 const URl = require("../models/url");
+const redis = require("../config/redis");
 
 try {
   const isValidUrl = (url) => {
@@ -101,9 +102,34 @@ try {
         return res.status(404).send("URL not found or unauthorized");
       }
 
+      // Remove corresponding Redis cache
+      await redis.del(`url:${shortId}`);
+
       return res.redirect("/");
     } catch (error) {
       console.error("Delete URL error:", error);
+      return res.status(500).send("Unable to delete URL");
+    }
+  }
+  async function handleAdminDeleteShortUrl(req, res) {
+    try {
+      const { shortId } = req.params;
+
+      // Admin can delete any URL
+      const deletedUrl = await URl.findOneAndDelete({
+        shortId,
+      });
+
+      if (!deletedUrl) {
+        return res.status(404).send("URL not found");
+      }
+
+      // Remove Redis cache
+      await redis.del(`url:${shortId}`);
+
+      return res.redirect("/admin/urls");
+    } catch (error) {
+      console.error("Admin delete URL error:", error);
       return res.status(500).send("Unable to delete URL");
     }
   }
@@ -111,6 +137,7 @@ try {
     handleGenerateNewShortUrl,
     getAnalyticsForShortUrl,
     handleDeleteShortUrl,
+    handleAdminDeleteShortUrl,
   };
 } catch (err) {
   console.error(err);
