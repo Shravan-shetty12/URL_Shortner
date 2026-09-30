@@ -31,7 +31,6 @@ A full-stack URL shortening service built with **Node.js, Express, MongoDB, and 
 
 ## 🏗️ Architecture
 
-![Architecture Diagram]
 <img width="3413" height="1847" alt="architecture" src="https://github.com/user-attachments/assets/1aceeed5-c07e-4c06-806a-e18361453950" />
 
 The application follows an MVC pattern. Redirects use a **cache-aside** strategy: Redis is checked first, MongoDB is the source of truth, and every visit is logged in MongoDB for analytics.
